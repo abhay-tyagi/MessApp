@@ -1,17 +1,102 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/relativeLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".TwoFragment">
+    tools:context=".TwoFragment"
+    tools:layout_editor_absoluteY="81dp">
 
     <!-- TODO: Update blank fragment layout -->
-    <TextView
+
+    <CalendarView
+        android:id="@+id/messCalendar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Hey 2"
-        android:textSize="40sp"
-        android:textStyle="bold"
-        android:layout_centerInParent="true"/>
 
-</RelativeLayout>
+        android:layout_marginStart="2dp"
+        app:layout_constraintStart_toStartOf="@+id/brkHead"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/lnhHead"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="3dp"
+        android:gravity="center_horizontal"
+        android:text="Lunch"
+        android:textSize="18sp"
+        app:layout_constraintStart_toStartOf="@+id/lnhNum"
+        app:layout_constraintTop_toBottomOf="@+id/messCalendar" />
+
+    <TextView
+        android:id="@+id/dinHead"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="4dp"
+        android:gravity="center_horizontal"
+        android:text="Dinner"
+        android:textSize="18sp"
+        app:layout_constraintEnd_toEndOf="@+id/dinNum"
+        app:layout_constraintTop_toBottomOf="@+id/messCalendar" />
+
+    <TextView
+        android:id="@+id/brkHead"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:text="Breakfast"
+        android:textSize="18sp"
+        app:layout_constraintStart_toStartOf="@+id/brkNum"
+        app:layout_constraintTop_toBottomOf="@+id/messCalendar" />
+
+    <TextView
+        android:id="@+id/lnhNum"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="4dp"
+        android:gravity="right"
+        android:text=""
+        android:textSize="18sp"
+        app:layout_constraintEnd_toStartOf="@+id/dinNum"
+        app:layout_constraintStart_toEndOf="@+id/brkNum"
+        app:layout_constraintTop_toBottomOf="@+id/lnhHead"
+        tools:text="Number" />
+
+    <TextView
+        android:id="@+id/dinNum"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="12dp"
+        android:gravity="center_horizontal"
+        android:text="Number"
+        android:textSize="18sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/lnhNum"
+        app:layout_constraintTop_toBottomOf="@+id/dinHead" />
+
+    <TextView
+        android:id="@+id/brkNum"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:text="Number"
+        android:textSize="18sp"
+        app:layout_constraintEnd_toStartOf="@+id/lnhNum"
+        app:layout_constraintHorizontal_chainStyle="spread_inside"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/brkHead" />
+
+    <Spinner
+        android:id="@+id/messNameSpinner"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="64dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="60dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/brkNum" />
+
+</android.support.constraint.ConstraintLayout>

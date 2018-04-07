@@ -178,12 +178,26 @@ public class LoginActivity extends AppCompatActivity {
                 return false;
             }
 
-            return (mUsername.equals("admin") && mPassword.equals("adminpass"));
+            if(mUsername.equals("admin") && mPassword.equals("adminpass"))
+                return true;
+            else if(mUsername.equals("machine") && mPassword.equals("machinepass"))
+                return true;
+            else
+            {
+                MessDBHandler messDBHandler = new MessDBHandler(LoginActivity.this, null);
 
+                String q = "SELECT * FROM USERS WHERE USERNAME" + "=\"" + mUsername + "\";";
 
+                Cursor c = messDBHandler.getResult(q);
 
-            // TODO: register the new account here.
-//            return true;
+                while (!c.isAfterLast()) {
+                    if (c.getString(c.getColumnIndex("USERNAME")).equals(mUsername) && c.getString(c.getColumnIndex("PASSWORD")).equals(mPassword)) {
+                        return true;
+                    }
+                    c.moveToNext();
+                }
+            }
+            return false;
         }
 
         @Override
@@ -193,9 +207,18 @@ public class LoginActivity extends AppCompatActivity {
             if (success) {
                     addNewPreferences(mUsernameView.getText().toString(), mPasswordView.getText().toString());
 
-                    Intent i = new Intent(LoginActivity.this, AdminActivity.class);
-                    i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_NEW_TASK);
-                    startActivity(i);
+                    if(mUsername.equals("admin")) {
+                        Intent i = new Intent(LoginActivity.this, AdminActivity.class);
+                        i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(i);
+                    }
+                    else if(mUsername.equals("machine")) {
+                        Intent i = new Intent(LoginActivity.this, MachineActivity.class);
+                        i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(i);
+                    }
+                    else {
+                    }
 
             } else {
                 mPasswordView.setError(getString(R.string.error_incorrect_password));

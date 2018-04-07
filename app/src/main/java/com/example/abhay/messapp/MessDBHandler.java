@@ -20,6 +20,7 @@ public class MessDBHandler extends SQLiteOpenHelper{
     public static final String TABLE_MESSES = "messes";
     public static final String TABLE_MESSINSTANCES = "messinstances";
     public static final String TABLE_SCANINSTANCES = "scaninstances";
+    public static final String TABLE_BILLS = "bills";
 
 
     public MessDBHandler(Context context, SQLiteDatabase.CursorFactory factory) {
@@ -63,11 +64,49 @@ public class MessDBHandler extends SQLiteOpenHelper{
                 "SCANDATE DATE, " +
                 "SCANTIME INTEGER);";
         db.execSQL(q);
+
+        q = "CREATE TABLE " + TABLE_BILLS +
+                " (BILLID INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                "USER REFERENCES USER, " +
+                "MAINCOST INTEGER, " +
+                "EXTRASCOST INTEGER, " +
+                "BILLYEAR INTEGER, " +
+                "BILLMONTH INTEGER, " +
+                "BILLDAY INTEGER);";
+        db.execSQL(q);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 
+    }
+
+    public void onUpgrade() {
+        SQLiteDatabase db = getWritableDatabase();
+        String q = "CREATE TABLE " + TABLE_BILLS +
+                " (BILLID INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                "USER REFERENCES USER, " +
+                "MAINCOST INTEGER, " +
+                "EXTRASCOST INTEGER, " +
+                "BILLYEAR INTEGER, " +
+                "BILLMONTH INTEGER, " +
+                "BILLDAY INTEGER);";
+        db.execSQL(q);
+    }
+
+    public void addBill(Bill bill) {
+        ContentValues values = new ContentValues();
+        values.put("USER", bill.getBillUser());
+        values.put("MAINCOST", bill.getMainCost());
+        values.put("EXTRASCOST", bill.getExtrasCost());
+        values.put("BILLYEAR", bill.getBillYear());
+        values.put("BILLMONTH", bill.getBillMonth());
+        values.put("BILLDAY", bill.getBillDay());
+
+
+        SQLiteDatabase db = getWritableDatabase();
+        db.insert(TABLE_BILLS, null, values);
+        db.close();
     }
 
     public void addUser(User user) {
@@ -142,6 +181,11 @@ public class MessDBHandler extends SQLiteOpenHelper{
         db.execSQL("DELETE FROM " + TABLE_SCANINSTANCES + " WHERE SCANINSTANCEID" + "=\"" + id + "\";");
     }
 
+    public void deleteBill(int id) {
+        SQLiteDatabase db = getWritableDatabase();
+        db.execSQL("DELETE FROM " + TABLE_BILLS + " WHERE BILLID" + "=\"" + id + "\";");
+    }
+
     public String getEntireTable(String tableName) {
         String dbString = "";
         SQLiteDatabase db = getWritableDatabase();
@@ -154,6 +198,8 @@ public class MessDBHandler extends SQLiteOpenHelper{
             tableName = TABLE_MESSINSTANCES;
         else if(tableName.equals("SCANINSTANCE"))
             tableName = TABLE_SCANINSTANCES;
+        else if(tableName.equals("BILL"))
+            tableName = TABLE_BILLS;
 
         Log.i(TAG, tableName);
 
@@ -173,6 +219,21 @@ public class MessDBHandler extends SQLiteOpenHelper{
                     dbString += c.getString(c.getColumnIndex("MESSNAME"));
                     dbString += " ";
                     dbString += c.getString(c.getColumnIndex("MESSID"));
+                    dbString += "\n";
+                }
+                c.moveToNext();
+            }
+        }
+        else if(tableName.equals(TABLE_BILLS)) {
+            while (!c.isAfterLast()) {
+                if (c.getString(c.getColumnIndex("BILLID")) != null) {
+                    dbString += c.getString(c.getColumnIndex("USER"));
+                    dbString += " ";
+                    dbString += c.getString(c.getColumnIndex("BILLDAY"));
+                    dbString += " ";
+                    dbString += c.getString(c.getColumnIndex("BILLMONTH"));
+                    dbString += " ";
+                    dbString += c.getString(c.getColumnIndex("MAINCOST"));
                     dbString += "\n";
                 }
                 c.moveToNext();
@@ -216,6 +277,11 @@ public class MessDBHandler extends SQLiteOpenHelper{
         db.close();
 
         return dbString;
+    }
+
+    public void runUpdate(String q) {
+        SQLiteDatabase db = getWritableDatabase();
+        db.execSQL(q);
     }
 
     public Cursor getResult(String q) {

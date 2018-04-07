@@ -1,5 +1,8 @@
 package com.example.abhay.messapp;
 
+import android.database.Cursor;
+import android.view.View;
+
 import java.time.LocalDate;
 import java.util.Date;
 
@@ -20,6 +23,13 @@ public class MessInstance {
         this.lunchTotal = lunchTotal;
         this.dinnerTotal = dinnerTotal;
     }
+
+/*    public int[] getNumbers(Date date) {
+
+        View v = inflater.inflate(R.layout.fragment_two, container, false);
+        String q = "SELECT BREAKFASTTOTAL, LUNCHTOTAL, DINNERTOTAL FROM MESSES WHERE MESSNAME" + "=\"" + mess + "\";";
+        Cursor c = messDBHandler.getResult(q);
+    }*/
 
     public int getMessInstanceId() {
         return messInstanceId;
@@ -64,5 +74,9 @@ public class MessInstance {
 
     public void setDinnerTotal(int dinnerTotal) {
         this.dinnerTotal = dinnerTotal;
+    }
+
+    public void setDate(LocalDate date) {
+        this.date = date;
     }
 }

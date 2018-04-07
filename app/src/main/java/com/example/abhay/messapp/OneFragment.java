@@ -19,7 +19,7 @@ import android.widget.Toast;
 
 public class OneFragment extends Fragment{
 
-    String[] tables = { "Mess", "User", "Mess Instance", "Scan Instance"};
+    String[] tables = { "Mess", "User", "Bill", "Mess Instance", "Scan Instance"};
     Button button1, button2;
     MessDBHandler messDBHandler;
     public static final String TAG = "com.example.abhay.messapp";
@@ -54,6 +54,8 @@ public class OneFragment extends Fragment{
 
                         if(table.equals("User"))
                             callAddDialog("USER");
+                        else if(table.equals("Bill"))
+                            callAddDialog("BILL");
                         else if(table.equals("Mess"))
                             callAddDialog("MESS");
                         else if(table.equals("Mess Instance"))
@@ -77,6 +79,8 @@ public class OneFragment extends Fragment{
 
                         if(table.equals("User"))
                             callViewDialog("USER");
+                        else if(table.equals("Bill"))
+                            callViewDialog("BILL");
                         else if(table.equals("Mess"))
                             callViewDialog("MESS");
                         else if(table.equals("Mess Instance"))
@@ -92,7 +96,6 @@ public class OneFragment extends Fragment{
 
     private void callViewDialog(String table) {
         String content = messDBHandler.getEntireTable(table);
-        Log.i(TAG, content);
 
         Intent i = new Intent(getActivity(), TableViewActivity.class);
         i.putExtra("content", content);
@@ -105,6 +108,8 @@ public class OneFragment extends Fragment{
 
         if(table.equals("MESS"))
             myDialog.setContentView(R.layout.mess_form);
+        else if(table.equals("BILL"))
+            myDialog.setContentView(R.layout.bill_form);
         else if(table.equals("USER"))
             myDialog.setContentView(R.layout.user_form);
         else if(table.equals("MESSINSTANCE"))
@@ -118,6 +123,8 @@ public class OneFragment extends Fragment{
 
         if(table.equals("MESS"))
             btn = myDialog.findViewById(R.id.addMess);
+        else if(table.equals("BILL"))
+            btn = myDialog.findViewById(R.id.addBill);
         else if(table.equals("USER"))
             btn = myDialog.findViewById(R.id.addUser);
         else if(table.equals("MESSINSTANCE"))
@@ -135,6 +142,7 @@ public class OneFragment extends Fragment{
             EditText userName, userPass, userYear, userCourse, userBranch, userMess;
             EditText instanceMess, breakfast, lunch, dinner;
             EditText scanMess, userScanner;
+            EditText billUser, billMainCost, billExtrasCost, billDate;
 
             @Override
             public void onClick(View v) {
@@ -161,9 +169,78 @@ public class OneFragment extends Fragment{
 
                         messDBHandler.addMess(mess);
                         myDialog.dismiss();
-
-                        System.out.println("Done adding");
                     } else {
+                        Toast.makeText(v.getContext(), "Fill the details", Toast.LENGTH_LONG).show();
+                    }
+                }
+                else if(btn.getId() == R.id.addBill) {
+                    billUser = v.getRootView().findViewById(R.id.billUser);
+                    billMainCost = v.getRootView().findViewById(R.id.billMainCost);
+                    billExtrasCost = v.getRootView().findViewById(R.id.billExtrasCost);
+                    billDate = v.getRootView().findViewById(R.id.billDate);
+
+                    String user = billUser.getText().toString().trim();
+                    String mainCost = billMainCost.getText().toString().trim();
+                    String extrasCost = billExtrasCost.getText().toString().trim();
+                    String date = billDate.getText().toString().trim();
+
+                    if (!user.equals("") && !mainCost.equals("") && !extrasCost.equals("") && !date.equals("")) {
+                        String q = "SELECT * FROM USERS WHERE USERNAME" + "=\"" + user + "\";";
+                        Cursor c = messDBHandler.getResult(q);
+
+                        User u = new User();
+
+                        while (!c.isAfterLast()) {
+                            if (c.getString(c.getColumnIndex("USERNAME")).equals(user)) {
+                                u.setUsername(user);
+                                u.setPassword(c.getString(c.getColumnIndex("PASSWORD")));
+                                u.setYear(c.getInt(c.getColumnIndex("YEAR")));
+                                u.setCourse(c.getString(c.getColumnIndex("COURSE")));
+
+                                String mess = c.getString(c.getColumnIndex("MESS"));
+
+                                String qu = "SELECT * FROM MESSES WHERE MESSNAME" + "=\"" + mess + "\";";
+                                Cursor cu = messDBHandler.getResult(qu);
+
+                                Mess m = new Mess();
+
+                                while (!cu.isAfterLast()) {
+                                    if (cu.getString(c.getColumnIndex("MESSNAME")).equals(mess)) {
+                                        m.setMessName(mess);
+                                        m.setMessHead(c.getString(c.getColumnIndex("MESSHEAD")));
+                                        m.setDailyCost(c.getInt(c.getColumnIndex("DAILYCOST")));
+                                        m.setMessId(c.getInt(c.getColumnIndex("MESSID")));
+                                        m.setNonvegCost(c.getInt(c.getColumnIndex("NONVEGCOST")));
+                                        m.setCapacity(c.getInt(c.getColumnIndex("CAPACITY")));
+                                        break;
+                                    }
+                                    cu.moveToNext();
+                                }
+
+                                u.setMess(m);
+                                u.setBranch(c.getString(c.getColumnIndex("BRANCH")));
+
+                                break;
+                            }
+                            c.moveToNext();
+                        }
+
+                        Bill bill = new Bill();
+
+                        String[] dateFull = date.split("/");
+
+                        bill.setExtrasCost(Integer.parseInt(extrasCost));
+                        bill.setMainCost(Integer.parseInt(mainCost));
+                        bill.setBillDay(Integer.parseInt(dateFull[2]));
+                        bill.setBillMonth(Integer.parseInt(dateFull[1]));
+                        bill.setBillYear(Integer.parseInt(dateFull[0]));
+                        bill.setBillUser(u);
+
+                        messDBHandler.addBill(bill);
+                        myDialog.dismiss();
+
+                    }
+                    else {
                         Toast.makeText(v.getContext(), "Fill the details", Toast.LENGTH_LONG).show();
                     }
                 }
@@ -201,9 +278,6 @@ public class OneFragment extends Fragment{
                             c.moveToNext();
                         }
 
-                        Log.i(TAG, m.getMessName());
-                        Log.i(TAG, Integer.toString(m.getMessId()));
-
                         User user = new User();
                         user.setMess(m);
                         user.setUsername(name);
@@ -215,7 +289,6 @@ public class OneFragment extends Fragment{
                         messDBHandler.addUser(user);
                         myDialog.dismiss();
 
-                        Log.i(TAG, "Done adding user");
                     } else {
                         Toast.makeText(v.getContext(), "Fill the details", Toast.LENGTH_LONG).show();
                     }
