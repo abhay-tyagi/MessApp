@@ -231,9 +231,9 @@ public class MessDBHandler extends SQLiteOpenHelper{
                     dbString += " ";
                     dbString += c.getString(c.getColumnIndex("BILLDAY"));
                     dbString += " ";
-                    dbString += c.getString(c.getColumnIndex("BILLMONTH"));
-                    dbString += " ";
                     dbString += c.getString(c.getColumnIndex("MAINCOST"));
+                    dbString += " ";
+                    dbString += c.getString(c.getColumnIndex("EXTRASCOST"));
                     dbString += "\n";
                 }
                 c.moveToNext();

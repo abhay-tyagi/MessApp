@@ -5,38 +5,45 @@
     android:id="@+id/container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#ffffff">
+    android:background="#ffffff"
+    tools:layout_editor_absoluteY="81dp">
 
     <TextView
         android:id="@+id/textView1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="20dp"
-        android:layout_marginBottom="154dp"
-        android:layout_marginTop="71dp"
+        android:layout_marginBottom="69dp"
+        android:layout_marginStart="11dp"
         android:text="Scan"
         android:textColor="#000000"
         android:textSize="30dp"
         app:layout_constraintBottom_toTopOf="@+id/scanner"
+        app:layout_constraintStart_toStartOf="@+id/scanner" />
+
+    <Button
+        android:id="@+id/scanner2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="121dp"
+        android:gravity="center"
+        android:onClick="scanExtra"
+        android:text="Extras"
+        android:textSize="18sp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintStart_toStartOf="parent" />
 
     <Button
         android:id="@+id/scanner"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="10dp"
-        android:layout_marginBottom="221dp"
-        android:layout_marginEnd="67dp"
-        android:layout_marginStart="67dp"
+        android:layout_marginBottom="43dp"
+        android:layout_marginStart="1dp"
         android:gravity="center"
         android:onClick="scanQR"
-        android:text="QR Code"
-        android:textSize="18dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView1" />
+        android:text="Entry"
+        android:textSize="18sp"
+        app:layout_constraintBottom_toTopOf="@+id/scanner2"
+        app:layout_constraintStart_toStartOf="@+id/scanner2" />
 
 </android.support.constraint.ConstraintLayout>

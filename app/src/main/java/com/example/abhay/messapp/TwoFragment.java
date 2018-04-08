@@ -64,22 +64,25 @@ public class TwoFragment extends Fragment{
         adapter.setDropDownViewResource(android.R.layout.simple_dropdown_item_1line);
         spinner.setAdapter(adapter);
 
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd");
-        Date now = new Date();
-        String strDate = sdf.format(now);
-        String[] dateFull = strDate.split("/");
+//        SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd");
+//        Date now = new Date();
+//        String strDate = sdf.format(now);
+//        String[] dateFull = strDate.split("/");
 
-        setNumbersData("IFC B", v, Integer.parseInt(dateFull[0]), Integer.parseInt(dateFull[1]), Integer.parseInt(dateFull[2]));
-
+        try {
+            setNumbersData("IFC B", v, LocalDate.now().getYear(), LocalDate.now().getMonthValue(), LocalDate.now().getDayOfMonth());
+        }catch (Exception e) {}
         spinner.setOnItemSelectedListener(
                 new AdapterView.OnItemSelectedListener() {
                     @Override
                     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                        SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd");
-                        String selectedDate = sdf.format(new Date(calendarView.getDate()));
-                        String [] dateTopass = selectedDate.split("/");
+//                        SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd");
+//                        String selectedDate = sdf.format(new Date(calendarView.getDate()));
+//                        String [] dateTopass = selectedDate.split("/");
 
-                        setNumbersData(parent.getSelectedItem().toString(), v, Integer.parseInt(dateTopass[0]), Integer.parseInt(dateTopass[1]), Integer.parseInt(dateTopass[2]));
+                        try {
+                            setNumbersData(parent.getSelectedItem().toString(), v, LocalDate.now().getYear(), LocalDate.now().getMonthValue(), LocalDate.now().getDayOfMonth());
+                        } catch (Exception e) {}
                     }
 
                     @Override
@@ -92,7 +95,9 @@ public class TwoFragment extends Fragment{
                 new CalendarView.OnDateChangeListener() {
                     @Override
                     public void onSelectedDayChange(@NonNull CalendarView view, int year, int month, int dayOfMonth) {
-                        setNumbersData(spinner.getSelectedItem().toString(), v, year, month+1, dayOfMonth);
+                        try {
+                            setNumbersData(spinner.getSelectedItem().toString(), v, year, month + 1, dayOfMonth);
+                        }catch (Exception e) {}
                     }
                 }
         );
@@ -104,12 +109,14 @@ public class TwoFragment extends Fragment{
 //        String s = LocalDate.of(year, month, date).toString();
 //        Log.i(TAG, s);
 
+        try {
         String query = "SELECT * FROM MESSES WHERE MESSNAME" + "=\"" + mess + "\";";
         Cursor c = messDBHandler.getResult(query);
         int messId = c.getInt(c.getColumnIndex("MESSID"));
 
-        try {
-            query = "SELECT * FROM MESSINSTANCES WHERE MESS =" + messId + " AND MIDATE" + "=\"" + new Date(year, month, date) + "\";";
+        Log.i(TAG, (LocalDate.of(year, month, date)).toString());
+
+            query = "SELECT * FROM MESSINSTANCES WHERE MESS =" + messId + " AND MIDATE" + "=\"" + LocalDate.of(year, month, date) + "\";";
             c = messDBHandler.getResult(query);
 
 

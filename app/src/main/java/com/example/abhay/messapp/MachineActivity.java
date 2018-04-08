@@ -41,12 +41,111 @@ public class MachineActivity extends AppCompatActivity {
         messDBHandler = new MessDBHandler(MachineActivity.this, null);
     }
 
+    public void scanExtra(View v) {
+        try {
+            if(true) {
+                String usersName = "abhay";
+                String q = "SELECT * FROM USERS WHERE USERNAME=" + "\"" + usersName + "\";";
+
+                Log.i(TAG, q);
+                Cursor c = messDBHandler.getResult(q);
+
+                Log.i(TAG, "MESS IS " + Integer.toString(c.getInt(c.getColumnIndex("MESS"))));
+
+                q = "SELECT * FROM MESSES WHERE MESSID" + "=\"" + Integer.toString(c.getInt(c.getColumnIndex("MESS"))) + "\";";
+                c = messDBHandler.getResult(q);
+
+                Log.i(TAG, "CAPACITY IS " + Integer.toString(c.getInt(c.getColumnIndex("CAPACITY"))));
+
+                Mess m = new Mess();
+                m.setCapacity(c.getInt(c.getColumnIndex("CAPACITY")));
+                m.setNonvegCost(c.getInt(c.getColumnIndex("NONVEGCOST")));
+                m.setDailyCost(c.getInt(c.getColumnIndex("DAILYCOST")));
+                m.setMessHead(c.getString(c.getColumnIndex("MESSHEAD")));
+                m.setMessName(c.getString(c.getColumnIndex("MESSNAME")));
+                m.setMessId(c.getInt(c.getColumnIndex("MESSID")));
+
+                q = "UPDATE BILLS SET EXTRASCOST = EXTRASCOST+" + m.getNonvegCost() + " WHERE BILLYEAR = " + LocalDate.now().getYear() + " AND BILLMONTH = " + LocalDate.now().getMonthValue() + " AND BILLDAY = " + LocalDate.now().getDayOfMonth() + " AND USER = '" + usersName + "'" + ";";
+                Log.i(TAG, q);
+                messDBHandler.runUpdate(q);
+            }
+            else {
+                Toast.makeText(this, "Wrong Code", Toast.LENGTH_LONG).show();
+            }
+        } catch (ActivityNotFoundException anfe) {
+            //on catch, show the download dialog
+            showDialog(MachineActivity.this, "No Scanner Found", "Download a scanner code activity?", "Yes", "No").show();
+        }
+    }
+
     public void scanQR(View v) {
         try {
             //start the scanning activity from the com.google.zxing.client.android.SCAN intent
-            Intent intent = new Intent(ACTION_SCAN);
-            intent.putExtra("SCAN_MODE", "QR_CODE_MODE");
-            startActivityForResult(intent, 0);
+//            Intent intent = new Intent(ACTION_SCAN);
+//            intent.putExtra("SCAN_MODE", "QR_CODE_MODE");
+//            startActivityForResult(intent, 0);
+
+            if(true) {
+                ScanInstance scanInstance = new ScanInstance();
+                scanInstance.setUserScanner("abhay");
+                scanInstance.setScanDate(LocalDate.now());
+                scanInstance.setScanTime(LocalTime.now().getHour());
+
+                String usersName = "abhay";
+                String q = "SELECT * FROM USERS WHERE USERNAME=" + "\"" + usersName + "\";";
+
+                Log.i(TAG, q);
+                Cursor c = messDBHandler.getResult(q);
+
+                Log.i(TAG, "MESS IS " + Integer.toString(c.getInt(c.getColumnIndex("MESS"))));
+
+                q = "SELECT * FROM MESSES WHERE MESSID" + "=\"" + Integer.toString(c.getInt(c.getColumnIndex("MESS"))) + "\";";
+                c = messDBHandler.getResult(q);
+
+                Log.i(TAG, "CAPACITY IS " + Integer.toString(c.getInt(c.getColumnIndex("CAPACITY"))));
+
+                Mess m = new Mess();
+                m.setCapacity(c.getInt(c.getColumnIndex("CAPACITY")));
+                m.setNonvegCost(c.getInt(c.getColumnIndex("NONVEGCOST")));
+                m.setDailyCost(c.getInt(c.getColumnIndex("DAILYCOST")));
+                m.setMessHead(c.getString(c.getColumnIndex("MESSHEAD")));
+                m.setMessName(c.getString(c.getColumnIndex("MESSNAME")));
+                m.setMessId(c.getInt(c.getColumnIndex("MESSID")));
+
+                scanInstance.setMess(m);
+                messDBHandler.addScanInstance(scanInstance);
+
+                String timePeriod;
+
+                if(scanInstance.getScanTime() >= 6 && scanInstance.getScanTime() <= 9)
+                    timePeriod = "BREAKFASTTOTAL";
+                else if(scanInstance.getScanTime() >= 11 && scanInstance.getScanTime() <= 14)
+                    timePeriod = "LUNCHTOTAL";
+                else if(scanInstance.getScanTime() >= 6 && scanInstance.getScanTime() <= 21)
+                    timePeriod = "DINNERTOTAL";
+                else
+                    timePeriod = "BREAKFASTTOTAL";
+
+
+                q = "SELECT * FROM MESSINSTANCES WHERE MESS =" + m.getMessId() + " AND MIDATE" + "=\"" + LocalDate.now() + "\";";
+//                q = "SELECT * FROM MESSINSTANCES WHERE MIDATE = '" + LocalDate.now().toString() + "' AND MESS = '" +  + "';";
+                Log.i(TAG, q);
+
+                Cursor cc = messDBHandler.getResult(q);
+
+                Log.i(TAG, "MESSinstance IS " + cc.getString(cc.getColumnIndex("BREAKFASTTOTAL")));
+
+                q = "UPDATE MESSINSTANCES SET " + timePeriod + "=" + timePeriod + "+1 WHERE MIDATE" + "=\"" + LocalDate.now() + "\" AND MESS =" + m.getMessId() + ";";
+                Log.i(TAG, q);
+                messDBHandler.runUpdate(q);
+
+                q = "UPDATE BILLS SET MAINCOST = MAINCOST+" + m.getDailyCost() + " WHERE BILLYEAR = " + LocalDate.now().getYear() + " AND BILLMONTH = " + LocalDate.now().getMonthValue() + " AND BILLDAY = " + LocalDate.now().getDayOfMonth() + " AND USER = '" + usersName + "'" + ";";
+                Log.i(TAG, q);
+                messDBHandler.runUpdate(q);
+            }
+            else {
+                Toast.makeText(this, "Wrong Code", Toast.LENGTH_LONG).show();
+            }
         } catch (ActivityNotFoundException anfe) {
             //on catch, show the download dialog
             showDialog(MachineActivity.this, "No Scanner Found", "Download a scanner code activity?", "Yes", "No").show();
@@ -76,7 +175,7 @@ public class MachineActivity extends AppCompatActivity {
     }
 
     public void onActivityResult(int requestCode, int resultCode, Intent intent) {
-        if (requestCode == 0) {
+/*        if (requestCode == 0) {
             if (resultCode == RESULT_OK) {
                 //get the extras that are returned from the intent
                 String contents = intent.getStringExtra("SCAN_RESULT");
@@ -89,19 +188,10 @@ public class MachineActivity extends AppCompatActivity {
 
 
                 if(true) {
-                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd");
-                    Date now = new Date();
-                    String strDate = sdf.format(now);
-                    String[] dateFull = strDate.split("/");
-
-                    SimpleDateFormat stf = new SimpleDateFormat("HH:mm:ss");
-                    String strTime = stf.format(now);
-                    String[] timeFull = strTime.split(":");
-
                     ScanInstance scanInstance = new ScanInstance();
                     scanInstance.setUserScanner(contents);
-                    scanInstance.setScanDate(new Date(Integer.parseInt(dateFull[0]), Integer.parseInt(dateFull[1]), Integer.parseInt(dateFull[0])));
-                    scanInstance.setScanTime(Integer.parseInt(timeFull[0]));
+                    scanInstance.setScanDate(LocalDate.now());
+                    scanInstance.setScanTime(LocalTime.now().getHour());
 
                     String q = "SELECT * FROM USERS WHERE USERNAME" + "=" + contents + ";";
                     Log.i(TAG, q);
@@ -136,21 +226,20 @@ public class MachineActivity extends AppCompatActivity {
                     else
                         timePeriod = "";
 
-                    q = "SELECT * FROM MESSINSTANCES WHERE MIDATE = " + strDate + " AND MESS" + "=\"" + Integer.toString(m.getMessId()) + "\";";
+                    q = "SELECT * FROM MESSINSTANCES WHERE MIDATE = " + LocalDate.now().toString() + " AND MESS" + "=\"" + Integer.toString(m.getMessId()) + "\";";
                     c = messDBHandler.getResult(q);
 
 
                     q = "UPDATE MESSINSTANCES SET " + timePeriod + " = " + timePeriod + "+1 WHERE MIDATE = " + Integer.toString(c.getInt(c.getColumnIndex(timePeriod))) + " AND MESS" + "=\"" + Integer.toString(m.getMessId()) + "\";";
                     messDBHandler.runUpdate(q);
 
-                    q = "UPDATE BILLS SET MAINCOST = MAINCOST+" + Integer.toString(m.getDailyCost()) + " WHERE BILLYEAR = " + dateFull[0] + " AND BILLMONTH = " + dateFull[1] + " AND BILLDAY = " + dateFull[2] + ";";
+                    q = "UPDATE BILLS SET MAINCOST = MAINCOST+" + Integer.toString(m.getDailyCost()) + " WHERE BILLYEAR = " + LocalDate.now().getYear() + " AND BILLMONTH = " + LocalDate.now().getMonthValue()+1 + " AND BILLDAY = " + LocalDate.now().getDayOfMonth() + ";";
                     messDBHandler.runUpdate(q);
                 }
                 else {
                     Toast.makeText(this, "Wrong Code", Toast.LENGTH_LONG).show();
                 }
             }
-        }
+        }*/
     }
-
 }
